@@ -1,15 +1,16 @@
 # rv32i-dsp
 
-A custom RISC-V (RV32I) processor implemented in SystemVerilog, extended with a hardware DSP coprocessor, targeting the Digilent Basys 3 (Xilinx Artix-7) FPGA. Developed as a personal project to deepen practical experience with RTL design, FPGA implementation, and algorithm-to-hardware deployment using the Vivado toolchain.
+A custom RISC-V (RV32I) processor implemented in SystemVerilog and extended with a hardware DSP coprocessor, targeting the Digilent Basys 3 (Xilinx Artix-7) FPGA. The project focuses on FPGA-based processor design, hardware acceleration, and practical RTL development using the Vivado toolchain.
 
 ---
 
 ## Project Goals
 
-- Implement a complete, functional RV32I in-order pipeline in SystemVerilog from scratch
+- Implement a complete, functional RV32I pipeline in SystemVerilog
 - Extend the core with a custom DSP peripheral (FIR filter) connected via a memory-mapped interface
 - Synthesize, implement, and achieve timing closure on the Basys 3 using Vivado WebPACK
 - Document architecture decisions, resource utilization, and timing results throughout
+- Run RISC-V programs on FPGA hardware
 
 ---
 
@@ -21,11 +22,11 @@ A custom RISC-V (RV32I) processor implemented in SystemVerilog, extended with a 
 - 5-stage in-order pipeline: Fetch → Decode → Execute → Memory → Writeback
 - Full RV32I base integer instruction set support
 - Hazard detection and data forwarding
-- Static branch prediction (branch-not-taken)
+- Fixed not-taken control flow behavior
 
 ### DSP Coprocessor
 - Pipelined FIR filter
-- Memory-mapped interface (planned: AXI4-Lite)
+- Memory-mapped interface
 - Configurable filter coefficients
 
 ### Memory
@@ -52,7 +53,7 @@ rv32i-dsp/
 
 | Tool | Version |
 |------|---------|
-| Vivado WebPACK | 2024.x |
+| Vivado WebPACK | 2025.2.1 |
 | Target Device | XC7A35T-1CPG236C (Basys 3) |
 | HDL | SystemVerilog |
 
@@ -66,11 +67,20 @@ rv32i-dsp/
 | Hazard Detection | 🔲 Not started |
 | FIR Filter | 🔲 Not started |
 | Memory Interface | 🔲 Not started |
-| AXI4-Lite Peripheral | 🔲 Not started |
+| DSP Peripheral Interface | 🔲 Not started |
 | Top-level Integration | 🔲 Not started |
 | Timing Closure (Basys 3) | 🔲 Not started |
 
 ---
+
+## Future Work
+
+- Instruction and data caches
+- Dynamic branch prediction
+- Custom RISC-V DSP instructions
+- DMA support
+- FFT accelerator
+- AXI-based interconnect
 
 ## References
 
