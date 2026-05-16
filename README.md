@@ -7,10 +7,10 @@ A custom RISC-V (RV32I) processor implemented in SystemVerilog and extended with
 ## Project Goals
 
 - Implement a complete, functional RV32I pipeline in SystemVerilog
-- Extend the core with a custom DSP peripheral (FIR filter) connected via a memory-mapped interface
-- Synthesize, implement, and achieve timing closure on the Basys 3 using Vivado WebPACK
+- Extend the core with a custom FIR filter DSP peripheral connected via a memory-mapped interface
+- Demonstrate hardware acceleration through an end-to-end audio filtering pipeline
+- Synthesize, implement, and achieve timing closure on the Basys 3
 - Document architecture decisions, resource utilization, and timing results throughout
-- Run RISC-V programs on FPGA hardware
 
 ---
 
@@ -25,12 +25,41 @@ A custom RISC-V (RV32I) processor implemented in SystemVerilog and extended with
 - Fixed not-taken control flow behavior
 
 ### DSP Coprocessor
-- Pipelined FIR filter
-- Memory-mapped interface
+- Pipelined FIR filter for audio signal processing
+- Memory-mapped interface (MMIO)
 - Configurable filter coefficients
+- Fixed-point arithmetic (Q1.15)
 
 ### Memory
 - Instruction and data memory (on-chip BRAM)
+- Program loaded via memory initialization file at bitstream generation
+
+---
+
+## Demo: Audio Filtering Pipeline
+
+The Phase 1 demo sends audio samples from a PC to the FPGA over UART, filters them using the hardware FIR accelerator, and returns the filtered output to be reconstructed as a WAV file.
+
+```
+PC (Python)
+    |
+    | WAV samples over UART
+    v
+RV32I Core (FPGA)
+    |
+    | MMIO writes
+    v
+FIR DSP Accelerator
+    |
+    | Filtered samples over UART
+    v
+PC (Python)
+    |
+    v
+Filtered WAV output
+```
+
+The demo benchmarks software-only FIR on the RV32I core against hardware-accelerated FIR to measure speedup, cycles, and FPGA DSP resource utilization.
 
 ---
 
@@ -44,6 +73,7 @@ rv32i-dsp/
 ├── tb/                   # Testbenches
 ├── constraints/          # Vivado XDC constraints (Basys 3)
 ├── sim/                  # Simulation scripts and waveform configs
+├── sw/                   # Bare-metal firmware and host Python scripts
 └── docs/                 # Architecture notes and design log
 ```
 
@@ -68,19 +98,27 @@ rv32i-dsp/
 | FIR Filter | 🔲 Not started |
 | Memory Interface | 🔲 Not started |
 | DSP Peripheral Interface | 🔲 Not started |
+| UART Peripheral | 🔲 Not started |
 | Top-level Integration | 🔲 Not started |
 | Timing Closure (Basys 3) | 🔲 Not started |
 
 ---
 
-## Future Work
+## Roadmap
 
-- Instruction and data caches
-- Dynamic branch prediction
-- Custom RISC-V DSP instructions
-- DMA support
-- FFT accelerator
-- AXI-based interconnect
+### Phase 1 — RV32I + FIR Accelerator
+Audio noise reduction and tone filtering demo. RV32I core handles UART communication and MMIO, FIR accelerator performs hardware-accelerated filtering. Benchmarks software vs. hardware FIR execution.
+
+### Phase 2 — Custom DSP ISA Extensions
+Extend the RV32I ISA with custom MAC and saturating arithmetic instructions. Modify decode, ALU, and control logic to accelerate DSP workloads natively in the pipeline. Benchmark cycles-per-tap against baseline.
+
+### Phase 3 — Caches and Performance Counters
+Add instruction and data caches with performance counter CSRs tracking cycles, instructions retired, cache misses, and branch behavior. Use the CPU as a benchmarking platform for embedded workloads.
+
+### Phase 4 — Hardware Accelerator
+Add a matrix multiply or FFT accelerator. Target application is either tiny neural network inference (MLP/CNN layer) or a real-time frequency spectrum analyzer, depending on direction.
+
+---
 
 ## References
 
